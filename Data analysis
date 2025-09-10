@@ -1,0 +1,94 @@
+import pandas as pd
+
+# Load the Iris dataset
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
+column_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'class']
+df = pd.read_csv(url, names=column_names)
+
+print("IRIS DATASET ANALYSIS")
+print("=" * 50)
+
+# 1. Basic statistics using .describe()
+print("1. BASIC STATISTICS FOR NUMERICAL COLUMNS:")
+print("=" * 40)
+print(df.describe())
+print("\n")
+
+# 2. Group by categorical column and compute mean
+print("2. GROUP BY SPECIES AND COMPUTE MEANS:")
+print("=" * 40)
+
+# Group by species and compute mean for all numerical columns
+grouped_means = df.groupby('class').mean()
+print("Mean values for each species:")
+print(grouped_means)
+print("\n")
+
+# More detailed grouping analysis
+print("3. DETAILED ANALYSIS BY SPECIES:")
+print("=" * 40)
+
+# Analyze each measurement by species
+for column in ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']:
+    species_stats = df.groupby('class')[column].agg(['mean', 'median', 'std', 'min', 'max'])
+    print(f"\n{column.replace('_', ' ').title()} by species:")
+    print(species_stats)
+print("\n")
+
+# 4. Identify patterns and interesting findings
+print("4. INTERESTING FINDINGS AND PATTERNS:")
+print("=" * 40)
+
+# Pattern 1: Compare petal measurements across species
+print("a) Petal Size Patterns:")
+petal_means = df.groupby('class')[['petal_length', 'petal_width']].mean()
+print(petal_means)
+print("→ Setosa has significantly smaller petals than other species")
+print("→ Virginica has the largest petals on average")
+print("\n")
+
+# Pattern 2: Compare sepal measurements
+print("b) Sepal Size Patterns:")
+sepal_means = df.groupby('class')[['sepal_length', 'sepal_width']].mean()
+print(sepal_means)
+print("→ Setosa has the widest sepals but shortest length")
+print("→ Virginica has the longest sepals")
+print("\n")
+
+# Pattern 3: Variability analysis
+print("c) Variability Analysis:")
+print("Standard deviation by species:")
+for column in df.columns[:-1]:  # Exclude the class column
+    std_by_species = df.groupby('class')[column].std()
+    print(f"\n{column}:")
+    print(std_by_species)
+print("→ Versicolor shows moderate variability across most measurements")
+print("→ Setosa shows relatively low variability in petal measurements")
+print("\n")
+
+# Pattern 4: Range analysis
+print("d) Measurement Ranges:")
+for column in df.columns[:-1]:
+    ranges = df.groupby('class')[column].agg(lambda x: x.max() - x.min())
+    print(f"\n{column} range:")
+    print(ranges)
+print("→ Virginica has the widest range in petal length")
+print("→ Setosa has the smallest range in petal measurements")
+print("\n")
+
+# 5. Additional interesting comparisons
+print("e) Additional Insights:")
+print("- Petal length to width ratio:")
+df['petal_ratio'] = df['petal_length'] / df['petal_width']
+petal_ratio_stats = df.groupby('class')['petal_ratio'].agg(['mean', 'std'])
+print(petal_ratio_stats)
+print("→ Versicolor has the most consistent petal shape (lowest std)")
+print("→ Setosa has the most elongated petals (highest ratio)")
+
+print("\n")
+print("- Sepal length to width ratio:")
+df['sepal_ratio'] = df['sepal_length'] / df['sepal_width']
+sepal_ratio_stats = df.groupby('class')['sepal_ratio'].agg(['mean', 'std'])
+print(sepal_ratio_stats)
+print("→ Virginica has the most elongated sepals")
+print("→ Setosa has the most rounded sepals (lowest ratio)")
